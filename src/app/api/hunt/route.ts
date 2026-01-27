@@ -103,15 +103,26 @@ export async function POST() {
     }
 
     // 프로필 조회
-    const { data: profile, error: profileError } = await supabase
+    const { data: profileData, error: profileError } = await supabase
       .from("profiles")
       .select("current_hunting_level, hunting_keys, is_hunting, hunting_started_at, gold, protection_low, protection_mid, protection_high")
       .eq("id", user.id)
       .single();
 
-    if (profileError || !profile) {
+    if (profileError || !profileData) {
       return NextResponse.json({ error: "프로필을 찾을 수 없습니다" }, { status: 404 });
     }
+
+    const profile = profileData as {
+      current_hunting_level: number;
+      hunting_keys: number;
+      is_hunting: boolean;
+      hunting_started_at: string | null;
+      gold: number;
+      protection_low: number;
+      protection_mid: number;
+      protection_high: number;
+    };
 
     // 이미 사냥 중인지 확인
     if (profile.is_hunting && profile.hunting_started_at) {

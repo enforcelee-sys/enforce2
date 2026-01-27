@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(dir \"C:\\\\Users\\\\이준민\\\\Desktop\\\\enforce\" /s /b)",
+      "Bash(npm run build:*)",
+      "Bash(powershell -Command \"Import-Csv weapon_description_master.csv | Select-Object -ExpandProperty concept -Unique | Sort-Object\")",
+      "Bash(powershell -Command:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(dir /s /b)",
+      "Bash(dir \"C:\\\\Users\\\\이준민\\\\Desktop\\\\*\" /od /b)",
+      "Bash(dir \"C:\\\\Users\\\\이준민\\\\Desktop\\\\*.*\" /od /b)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import Card, { CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
 import type { Profile, Title, UserTitle } from "@/types/database";
 import NicknameEditor from "./NicknameEditor";
 import LogoutButton from "./LogoutButton";

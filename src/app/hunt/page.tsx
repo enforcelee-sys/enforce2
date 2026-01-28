@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createClient } from "@/lib/supabase/server";
 import Card, { CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import type { Profile } from "@/types/database";

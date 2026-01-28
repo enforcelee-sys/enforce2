@@ -225,6 +225,16 @@ export interface Database {
         Insert: Omit<CheckinLog, "id" | "checked_in_at">;
         Update: never;
       };
+      hunting_grounds: {
+        Row: HuntingGround;
+        Insert: HuntingGround;
+        Update: Partial<HuntingGround>;
+      };
+      hunting_logs: {
+        Row: HuntingLog;
+        Insert: Omit<HuntingLog, "id" | "created_at">;
+        Update: never;
+      };
     };
   };
 }

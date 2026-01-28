@@ -14,7 +14,14 @@
       "Bash(dir \"C:\\\\Users\\\\이준민\\\\Desktop\\\\*\" /od /b)",
       "Bash(dir \"C:\\\\Users\\\\이준민\\\\Desktop\\\\*.*\" /od /b)",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git config:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(curl:*)"
     ]
   }
 }

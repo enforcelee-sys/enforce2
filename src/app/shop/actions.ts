@@ -41,7 +41,7 @@ export async function claimGoldProduct(productId: string): Promise<{
   const profile = profileData as Profile;
 
   // 이미 수령했는지 확인
-  if ((profile as Record<string, boolean>)[product.field]) {
+  if ((profile as unknown as Record<string, boolean>)[product.field]) {
     return { success: false, message: "이미 수령한 상품입니다." };
   }
 
@@ -107,12 +107,12 @@ export async function claimProtectionProduct(productId: string): Promise<{
   const profile = profileData as Profile;
 
   // 이미 수령했는지 확인
-  if ((profile as Record<string, boolean>)[product.field]) {
+  if ((profile as unknown as Record<string, boolean>)[product.field]) {
     return { success: false, message: "이미 수령한 상품입니다." };
   }
 
   // 파괴 방지권 지급
-  const currentCount = (profile as Record<string, number>)[product.inventoryField] ?? 0;
+  const currentCount = (profile as unknown as Record<string, number>)[product.inventoryField] ?? 0;
 
   const { error: updateError } = await db
     .from("profiles")

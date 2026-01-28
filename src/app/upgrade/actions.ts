@@ -267,7 +267,7 @@ export async function attemptUpgrade(
   };
 
   const bestLevelField = getBestLevelField(profile.weapon_type);
-  const currentBestLevel = bestLevelField ? (profile as Record<string, number>)[bestLevelField] ?? 0 : 0;
+  const currentBestLevel = bestLevelField ? (profile as unknown as Record<string, number>)[bestLevelField] ?? 0 : 0;
   const shouldUpdateBest = result === "SUCCESS" && newLevel > currentBestLevel;
 
   // 7. DB 업데이트 (골드 차감 + 레벨 변경)

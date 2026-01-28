@@ -84,115 +84,74 @@ export default async function HomePage() {
   const canSell = currentLevel > 0;
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white">강화하기</h1>
-
-      {/* 보유 골드 */}
-      <Card>
-        <CardContent className="py-4">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-400">보유 골드</span>
-            <span className="text-2xl font-bold text-yellow-400">
-              {gold.toLocaleString()} G
-            </span>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* 현재 무기 - 개선된 디자인 */}
-      <Card variant="highlight">
-        <CardHeader>
-          <CardTitle>현재 무기</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {profile ? (
-            <div className="relative overflow-hidden rounded-xl bg-gradient-to-b from-gray-800/50 to-gray-900/50 p-6">
-              {/* 배경 이펙트 */}
-              <div className="absolute inset-0 opacity-20">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-blue-500 rounded-full blur-3xl" />
-              </div>
-
-              <div className="relative z-10 text-center">
-                {/* 무기 이모지 */}
-                <div className="inline-block p-4 bg-gray-800/50 rounded-full mb-4">
-                  <span className="text-6xl block">
-                    {getWeaponEmoji(profile.weapon_type)}
-                  </span>
-                </div>
-
-                {/* 무기 이름 */}
-                <p className="text-xl font-bold text-white">
-                  {weaponInfo?.name ?? `${profile.weapon_concept} ${profile.weapon_type}`}
-                </p>
-
-                {/* 강화 레벨 */}
-                <p className="text-4xl font-black text-blue-400 mt-2">
-                  +{currentLevel}
-                </p>
-
-                {/* 무기 타입 & 컨셉 */}
-                <p className="text-sm text-gray-400 mt-2">
-                  {profile.weapon_type} · {profile.weapon_concept}
-                </p>
-
-                {/* 무기 설명 */}
-                {weaponInfo?.description && (
-                  <div className="mt-4 pt-4 border-t border-white/10">
-                    <p className="text-gray-300 text-sm italic leading-relaxed">
-                      &quot;{weaponInfo.description}&quot;
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            <p className="text-center text-gray-500 py-4">
-              프로필 정보를 불러올 수 없습니다
+    <div className="space-y-2">
+      {/* 골드 + 무기 헤더 */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">{profile ? getWeaponEmoji(profile.weapon_type) : "⚔️"}</span>
+          <div>
+            <p className="text-white font-bold text-sm">
+              {weaponInfo?.name ?? `${profile?.weapon_concept ?? ""} ${profile?.weapon_type ?? ""}`}
             </p>
+            <p className="text-blue-400 font-black text-xl">+{currentLevel}</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-[10px] text-gray-500">보유 골드</p>
+          <p className="text-yellow-400 font-bold">{gold.toLocaleString()}G</p>
+        </div>
+      </div>
+
+      {/* 무기 카드 */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 p-4">
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-blue-500 rounded-full blur-3xl" />
+        </div>
+        <div className="relative z-10 text-center">
+          <span className="text-5xl block mb-2">{profile ? getWeaponEmoji(profile.weapon_type) : "⚔️"}</span>
+          <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+            +{currentLevel}
+          </p>
+          {weaponInfo?.description && (
+            <p className="text-gray-400 text-xs mt-2 line-clamp-2">&quot;{weaponInfo.description}&quot;</p>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* 강화 버튼 */}
-      <Card>
-        <CardContent className="py-6">
-          <UpgradeButtons
-            currentLevel={currentLevel}
-            gold={gold}
-            upgradeCost={upgradeCost}
-            canUpgrade={canUpgrade}
-            canSell={canSell}
-            sellPriceMin={sellPriceMin}
-            sellPriceMax={sellPriceMax}
-            weaponName={weaponInfo?.name ?? `${profile?.weapon_concept ?? ""} ${profile?.weapon_type ?? ""}`}
-            weaponDescription={weaponInfo?.description ?? null}
-            weaponType={profile?.weapon_type ?? "칼"}
-            nickname={profile?.nickname ?? null}
-            protectionLow={profile?.protection_low ?? 0}
-            protectionMid={profile?.protection_mid ?? 0}
-            protectionHigh={profile?.protection_high ?? 0}
-          />
-        </CardContent>
-      </Card>
+      <div className="bg-gray-900 rounded-2xl p-3">
+        <UpgradeButtons
+          currentLevel={currentLevel}
+          gold={gold}
+          upgradeCost={upgradeCost}
+          canUpgrade={canUpgrade}
+          canSell={canSell}
+          sellPriceMin={sellPriceMin}
+          sellPriceMax={sellPriceMax}
+          weaponName={weaponInfo?.name ?? `${profile?.weapon_concept ?? ""} ${profile?.weapon_type ?? ""}`}
+          weaponDescription={weaponInfo?.description ?? null}
+          weaponType={profile?.weapon_type ?? "칼"}
+          nickname={profile?.nickname ?? null}
+          protectionLow={profile?.protection_low ?? 0}
+          protectionMid={profile?.protection_mid ?? 0}
+          protectionHigh={profile?.protection_high ?? 0}
+        />
+      </div>
 
-      {/* 전체 유저 강화 피드 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-            </span>
-            실시간 강화 현황
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <RealtimeLogs
-            initialLogs={globalLogs ?? []}
-            currentUserId={user?.id ?? null}
-          />
-        </CardContent>
-      </Card>
+      {/* 실시간 피드 - 컴팩트 */}
+      <div className="bg-gray-900 rounded-2xl p-3">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
+          </span>
+          <span className="text-xs text-gray-400 font-medium">실시간</span>
+        </div>
+        <RealtimeLogs
+          initialLogs={globalLogs ?? []}
+          currentUserId={user?.id ?? null}
+        />
+      </div>
     </div>
   );
 }

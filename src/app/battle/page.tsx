@@ -21,9 +21,7 @@ export default async function BattlePage() {
   const ticketInfo = await getTicketInfo();
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white">배틀 / 랭킹</h1>
-
+    <div className="space-y-2">
       <BattleClient
         initialTickets={ticketInfo.tickets}
         nextRegenAt={ticketInfo.nextRegenAt}

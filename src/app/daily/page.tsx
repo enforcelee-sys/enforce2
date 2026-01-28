@@ -39,117 +39,68 @@ export default async function DailyPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white">출석체크</h1>
+    <div className="space-y-3">
+      {/* 헤더 + 현황 */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-lg font-bold text-white">출석체크</h1>
+        <div className="flex gap-3 text-sm">
+          <span className="text-blue-400 font-bold">{streakDay}일차</span>
+          <span className="text-yellow-400 font-bold">{todayCheckinGold.toLocaleString()}G</span>
+        </div>
+      </div>
 
-      {/* 오늘의 출석 */}
-      <Card variant={!canCheckin ? "default" : "highlight"}>
-        <CardHeader>
-          <CardTitle>출석 체크 (4시간 주기)</CardTitle>
-        </CardHeader>
-        <CardContent className="py-4">
-          <CheckInButton canCheckin={canCheckin} remainingHours={remainingHours} lastCheckinAt={profile?.last_checkin_at ?? null} />
-        </CardContent>
-      </Card>
-
-      {/* 오늘 출석 현황 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>오늘 출석 현황</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-4 bg-gray-800 rounded-lg">
-              <p className="text-sm text-gray-400">연속 출석</p>
-              <p className="text-2xl font-bold text-blue-400">{streakDay}일차</p>
-            </div>
-            <div className="text-center p-4 bg-gray-800 rounded-lg">
-              <p className="text-sm text-gray-400">오늘 획득 골드</p>
-              <p className="text-2xl font-bold text-yellow-400">{todayCheckinGold.toLocaleString()} G</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* 출석 버튼 */}
+      <div className={`rounded-2xl p-4 ${canCheckin ? "bg-gradient-to-r from-blue-600 to-purple-600" : "bg-gray-800"}`}>
+        <CheckInButton canCheckin={canCheckin} remainingHours={remainingHours} lastCheckinAt={profile?.last_checkin_at ?? null} />
+      </div>
 
       {/* 주간 출석 현황 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>연속 출석 현황</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-7 gap-2">
-            {[1, 2, 3, 4, 5, 6, 7].map((day) => {
-              const isCompleted = streakDay >= day;
-              const isBonus = day === 5 || day === 7;
-              return (
-                <div
-                  key={day}
-                  className={`text-center py-3 rounded-lg ${
-                    isCompleted
-                      ? isBonus
-                        ? "bg-orange-900/50 border border-orange-500"
-                        : "bg-green-900/50 border border-green-500"
-                      : "bg-gray-800 border border-gray-700"
-                  }`}
-                >
-                  <p className="text-xs text-gray-400">{day}일</p>
-                  <p className={isCompleted ? (isBonus ? "text-orange-400" : "text-green-400") : "text-gray-600"}>
-                    {isCompleted ? "✓" : "-"}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* 연속 출석 보상 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>연속 출석 보상</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {rewards.map((item) => (
+      <div className="bg-gray-900 rounded-2xl p-3">
+        <p className="text-xs text-gray-500 mb-2">연속 출석</p>
+        <div className="grid grid-cols-7 gap-1.5">
+          {[1, 2, 3, 4, 5, 6, 7].map((day) => {
+            const isCompleted = streakDay >= day;
+            const isBonus = day === 5 || day === 7;
+            return (
               <div
-                key={item.day}
-                className={`flex justify-between items-center p-3 rounded-lg ${
-                  item.claimed
-                    ? item.bonus
-                      ? "bg-orange-900/30 border border-orange-500/50"
-                      : "bg-gray-800"
-                    : item.bonus
-                    ? "bg-gray-900 border border-orange-500/30"
-                    : "bg-gray-900"
+                key={day}
+                className={`text-center py-2 rounded-xl ${
+                  isCompleted
+                    ? isBonus
+                      ? "bg-orange-500/20 border border-orange-500"
+                      : "bg-green-500/20 border border-green-500"
+                    : "bg-gray-800"
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`w-8 h-8 flex items-center justify-center rounded-full ${
-                      item.claimed
-                        ? item.bonus
-                          ? "bg-orange-600"
-                          : "bg-green-600"
-                        : "bg-gray-700"
-                    }`}
-                  >
-                    {item.claimed ? "✓" : item.day}
-                  </span>
-                  <span className={item.claimed ? "text-gray-400" : "text-white"}>
-                    {item.day}일차
-                    {item.bonus && <span className="text-orange-400 ml-1 text-xs">(보너스)</span>}
-                  </span>
-                </div>
-                {item.reward && (
-                  <span className={item.claimed ? "text-gray-500" : "text-orange-400"}>
-                    {item.reward}
-                  </span>
-                )}
+                <p className="text-[10px] text-gray-500">{day}</p>
+                <p className={`text-sm ${isCompleted ? (isBonus ? "text-orange-400" : "text-green-400") : "text-gray-600"}`}>
+                  {isCompleted ? "✓" : "-"}
+                </p>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 보상 목록 - 컴팩트 */}
+      <div className="bg-gray-900 rounded-2xl p-3">
+        <p className="text-xs text-gray-500 mb-2">보상</p>
+        <div className="grid grid-cols-2 gap-2">
+          {rewards.filter(r => r.bonus).map((item) => (
+            <div
+              key={item.day}
+              className={`flex items-center justify-between p-2 rounded-xl ${
+                item.claimed ? "bg-orange-500/20" : "bg-gray-800"
+              }`}
+            >
+              <span className="text-xs text-gray-400">{item.day}일차</span>
+              <span className={`text-xs font-bold ${item.claimed ? "text-orange-400" : "text-orange-300"}`}>
+                {item.reward}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

@@ -85,42 +85,31 @@ export default async function HomePage() {
   const canSell = currentLevel > 0;
 
   return (
-    <div className="space-y-2">
-      {/* 골드 + 무기 헤더 */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">{profile ? getWeaponEmoji(profile.weapon_type) : "⚔️"}</span>
-          <div>
-            <p className="text-white font-bold text-sm">
-              {weaponInfo?.name ?? `${profile?.weapon_concept ?? ""} ${profile?.weapon_type ?? ""}`}
-            </p>
-            <p className="text-blue-400 font-black text-xl">+{currentLevel}</p>
-          </div>
+    <div className="space-y-3">
+      {/* 무기 카드 - 모든 정보 통합 */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 p-5">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-blue-500 rounded-full blur-3xl" />
         </div>
-        <div className="text-right">
-          <p className="text-[10px] text-gray-500">보유 골드</p>
-          <p className="text-yellow-400 font-bold">{gold.toLocaleString()}G</p>
-        </div>
-      </div>
 
-      {/* 무기 카드 */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 p-4">
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-blue-500 rounded-full blur-3xl" />
+        {/* 골드 - 우측 상단 */}
+        <div className="absolute top-3 right-3 bg-black/30 px-3 py-1 rounded-full">
+          <span className="text-yellow-400 font-bold text-sm">{gold.toLocaleString()}G</span>
         </div>
-        <div className="relative z-10 text-center">
-          <span className="text-5xl block mb-2">{profile ? getWeaponEmoji(profile.weapon_type) : "⚔️"}</span>
-          <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+
+        <div className="relative z-10 text-center pt-2">
+          <span className="text-6xl block mb-1">{profile ? getWeaponEmoji(profile.weapon_type) : "⚔️"}</span>
+          <p className="text-white font-medium text-sm mt-2">
+            {weaponInfo?.name ?? `${profile?.weapon_concept ?? ""} ${profile?.weapon_type ?? ""}`}
+          </p>
+          <p className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mt-1">
             +{currentLevel}
           </p>
-          {weaponInfo?.description && (
-            <p className="text-gray-400 text-xs mt-2 line-clamp-2">&quot;{weaponInfo.description}&quot;</p>
-          )}
         </div>
       </div>
 
       {/* 강화 버튼 */}
-      <div className="bg-gray-900 rounded-2xl p-3">
+      <div className="bg-gray-900 rounded-2xl p-4">
         <UpgradeButtons
           currentLevel={currentLevel}
           gold={gold}
@@ -139,7 +128,7 @@ export default async function HomePage() {
         />
       </div>
 
-      {/* 실시간 피드 - 컴팩트 */}
+      {/* 실시간 피드 */}
       <div className="bg-gray-900 rounded-2xl p-3">
         <div className="flex items-center gap-2 mb-2">
           <span className="relative flex h-1.5 w-1.5">

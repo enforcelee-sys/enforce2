@@ -1,8 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
-import Card, { CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import type { Profile, WeaponDescription } from "@/types/database";
 import UpgradeButtons from "./upgrade/UpgradeButtons";
 import RealtimeLogs from "./upgrade/RealtimeLogs";
+
+export const revalidate = 0; // 실시간 데이터
 
 // 강화 비용 테이블
 const UPGRADE_COSTS: Record<number, number> = {

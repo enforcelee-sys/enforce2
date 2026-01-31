@@ -62,7 +62,7 @@ CREATE POLICY "Anyone can read hunting_grounds"
 
 -- hunting_logs는 자신의 로그만 조회 가능
 CREATE POLICY "Users can view own hunting logs"
-  ON hunting_logs FOR SELECT USING (auth.uid() = user_id);
+  ON hunting_logs FOR SELECT USING ((select auth.uid()) = user_id);
 
 CREATE POLICY "Users can insert own hunting logs"
-  ON hunting_logs FOR INSERT WITH CHECK (auth.uid() = user_id);
+  ON hunting_logs FOR INSERT WITH CHECK ((select auth.uid()) = user_id);

@@ -197,11 +197,11 @@ CREATE POLICY "Anyone can view weapon_descriptions"
 -- profiles RLS
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view own profile"
-  ON profiles FOR SELECT USING (auth.uid() = id);
+  ON profiles FOR SELECT USING ((select auth.uid()) = id);
 CREATE POLICY "Users can update own profile"
-  ON profiles FOR UPDATE USING (auth.uid() = id);
+  ON profiles FOR UPDATE USING ((select auth.uid()) = id);
 CREATE POLICY "Users can insert own profile"
-  ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+  ON profiles FOR INSERT WITH CHECK ((select auth.uid()) = id);
 
 -- titles RLS (읽기 공개)
 ALTER TABLE titles ENABLE ROW LEVEL SECURITY;
@@ -211,32 +211,32 @@ CREATE POLICY "Anyone can view titles"
 -- user_titles RLS
 ALTER TABLE user_titles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view own titles"
-  ON user_titles FOR SELECT USING (auth.uid() = user_id);
+  ON user_titles FOR SELECT USING ((select auth.uid()) = user_id);
 CREATE POLICY "Users can insert own titles"
-  ON user_titles FOR INSERT WITH CHECK (auth.uid() = user_id);
+  ON user_titles FOR INSERT WITH CHECK ((select auth.uid()) = user_id);
 CREATE POLICY "Users can update own titles"
-  ON user_titles FOR UPDATE USING (auth.uid() = user_id);
+  ON user_titles FOR UPDATE USING ((select auth.uid()) = user_id);
 
 -- upgrade_logs RLS
 ALTER TABLE upgrade_logs ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can view own upgrade_logs"
-  ON upgrade_logs FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Anyone can view upgrade_logs"
+  ON upgrade_logs FOR SELECT USING (true);
 CREATE POLICY "Users can insert own upgrade_logs"
-  ON upgrade_logs FOR INSERT WITH CHECK (auth.uid() = user_id);
+  ON upgrade_logs FOR INSERT WITH CHECK ((select auth.uid()) = user_id);
 
 -- battle_logs RLS
 ALTER TABLE battle_logs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view own battle_logs"
-  ON battle_logs FOR SELECT USING (auth.uid() = user_id);
+  ON battle_logs FOR SELECT USING ((select auth.uid()) = user_id);
 CREATE POLICY "Users can insert own battle_logs"
-  ON battle_logs FOR INSERT WITH CHECK (auth.uid() = user_id);
+  ON battle_logs FOR INSERT WITH CHECK ((select auth.uid()) = user_id);
 
 -- checkin_logs RLS
 ALTER TABLE checkin_logs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view own checkin_logs"
-  ON checkin_logs FOR SELECT USING (auth.uid() = user_id);
+  ON checkin_logs FOR SELECT USING ((select auth.uid()) = user_id);
 CREATE POLICY "Users can insert own checkin_logs"
-  ON checkin_logs FOR INSERT WITH CHECK (auth.uid() = user_id);
+  ON checkin_logs FOR INSERT WITH CHECK ((select auth.uid()) = user_id);
 
 -- ============================================
 -- 초기 시드 데이터: 칭호

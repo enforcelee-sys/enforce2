@@ -9,24 +9,22 @@ export default async function ProfilePage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // 프로필 정보
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user?.id ?? "")
-    .single() as { data: Profile | null };
-
-  // 전체 칭호 목록
-  const { data: allTitles } = await supabase
-    .from("titles")
-    .select("*")
-    .order("condition_value", { ascending: true }) as { data: Title[] | null };
-
-  // 유저가 보유한 칭호
-  const { data: userTitles } = await supabase
-    .from("user_titles")
-    .select("*, title:titles(*)")
-    .eq("user_id", user?.id ?? "") as { data: UserTitle[] | null };
+  // 프로필, 전체 칭호, 유저 칭호를 병렬 조회
+  const [{ data: profile }, { data: allTitles }, { data: userTitles }] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user?.id ?? "")
+      .single() as Promise<{ data: Profile | null }>,
+    supabase
+      .from("titles")
+      .select("*")
+      .order("condition_value", { ascending: true }) as Promise<{ data: Title[] | null }>,
+    supabase
+      .from("user_titles")
+      .select("*, title:titles(*)")
+      .eq("user_id", user?.id ?? "") as Promise<{ data: UserTitle[] | null }>,
+  ]);
 
   const ownedTitleIds = new Set(userTitles?.map((ut) => ut.title_id) ?? []);
   const equippedTitle = userTitles?.find((ut) => ut.is_equipped);

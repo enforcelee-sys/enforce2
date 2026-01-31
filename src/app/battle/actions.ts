@@ -237,26 +237,25 @@ export async function executeBattle(): Promise<{
     weapon_level: number;
   };
 
-  // 4. 내 무기 이름 조회
-  const { data: myWeaponInfo } = await db
-    .from("weapon_descriptions")
-    .select("name")
-    .eq("weapon_type", profile.weapon_type)
-    .eq("concept", profile.weapon_concept)
-    .eq("level", profile.weapon_level)
-    .single();
+  // 4. 내 무기 + 상대 무기 이름 병렬 조회
+  const [{ data: myWeaponInfo }, { data: enemyWeaponInfo }] = await Promise.all([
+    db
+      .from("weapon_descriptions")
+      .select("name")
+      .eq("weapon_type", profile.weapon_type)
+      .eq("concept", profile.weapon_concept)
+      .eq("level", profile.weapon_level)
+      .single(),
+    db
+      .from("weapon_descriptions")
+      .select("name")
+      .eq("weapon_type", opponent.weapon_type)
+      .eq("concept", opponent.weapon_concept)
+      .eq("level", opponent.weapon_level)
+      .single(),
+  ]);
 
   const myWeaponName = myWeaponInfo?.name ?? `${profile.weapon_concept} ${profile.weapon_type}`;
-
-  // 5. 상대 무기 이름 조회
-  const { data: enemyWeaponInfo } = await db
-    .from("weapon_descriptions")
-    .select("name")
-    .eq("weapon_type", opponent.weapon_type)
-    .eq("concept", opponent.weapon_concept)
-    .eq("level", opponent.weapon_level)
-    .single();
-
   const enemyWeaponName = enemyWeaponInfo?.name ?? `${opponent.weapon_concept} ${opponent.weapon_type}`;
 
   // 6. 승률 계산
@@ -328,7 +327,6 @@ export async function executeBattle(): Promise<{
 
   // 12. 페이지 새로고침
   revalidatePath("/battle");
-  revalidatePath("/");
 
   return {
     success: true,
@@ -376,7 +374,8 @@ export async function getRankings(limit: number = 20): Promise<{
     .from("profiles")
     .select("id, nickname, weapon_type, weapon_level, created_at")
     .order("weapon_level", { ascending: false })
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: true })
+    .limit(100);
 
   if (!allRankings) {
     return { rankings: [], myRank: null };

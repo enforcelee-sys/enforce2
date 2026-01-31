@@ -34,6 +34,26 @@ export default function HuntingClient({
   const [result, setResult] = useState<HuntResult | null>(null);
   const [showResult, setShowResult] = useState(false);
 
+  // 사냥 완료 처리
+  const completeHunt = useCallback(async () => {
+    try {
+      const response = await fetch("/api/hunt", { method: "POST" });
+      const data = await response.json();
+
+      if (data.success) {
+        setResult(data);
+        setShowResult(true);
+      } else {
+        console.error("Hunt failed:", data.error);
+      }
+    } catch (error) {
+      console.error("Hunt error:", error);
+    } finally {
+      setIsHunting(false);
+      setCountdown(0);
+    }
+  }, []);
+
   // 초기 카운트다운 설정
   useEffect(() => {
     if (isHunting && huntingStartedAt) {
@@ -67,26 +87,6 @@ export default function HuntingClient({
 
     return () => clearInterval(timer);
   }, [countdown]);
-
-  // 사냥 완료 처리
-  const completeHunt = useCallback(async () => {
-    try {
-      const response = await fetch("/api/hunt", { method: "POST" });
-      const data = await response.json();
-
-      if (data.success) {
-        setResult(data);
-        setShowResult(true);
-      } else {
-        console.error("Hunt failed:", data.error);
-      }
-    } catch (error) {
-      console.error("Hunt error:", error);
-    } finally {
-      setIsHunting(false);
-      setCountdown(0);
-    }
-  }, []);
 
   // 사냥 시작
   const startHunt = async () => {

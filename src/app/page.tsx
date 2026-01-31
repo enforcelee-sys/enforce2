@@ -57,21 +57,21 @@ export default async function HomePage() {
     .eq("id", user?.id ?? "")
     .single() as { data: Profile | null };
 
-  // 현재 무기 이름 조회
-  const { data: weaponInfo } = await supabase
-    .from("weapon_descriptions")
-    .select("name, description")
-    .eq("weapon_type", profile?.weapon_type ?? "칼")
-    .eq("concept", profile?.weapon_concept ?? "그림자")
-    .eq("level", profile?.weapon_level ?? 0)
-    .single() as { data: Pick<WeaponDescription, "name" | "description"> | null };
-
-  // 전체 유저 강화 로그 (최근 20개)
-  const { data: globalLogs } = await db
-    .from("upgrade_logs")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(20) as { data: GlobalUpgradeLog[] | null };
+  // 무기 이름 + 전체 로그를 병렬 조회
+  const [{ data: weaponInfo }, { data: globalLogs }] = await Promise.all([
+    supabase
+      .from("weapon_descriptions")
+      .select("name, description")
+      .eq("weapon_type", profile?.weapon_type ?? "칼")
+      .eq("concept", profile?.weapon_concept ?? "그림자")
+      .eq("level", profile?.weapon_level ?? 0)
+      .single() as Promise<{ data: Pick<WeaponDescription, "name" | "description"> | null }>,
+    db
+      .from("upgrade_logs")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(20) as Promise<{ data: GlobalUpgradeLog[] | null }>,
+  ]);
 
 
   const currentLevel = profile?.weapon_level ?? 0;

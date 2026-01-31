@@ -313,46 +313,38 @@ export async function attemptUpgrade(
     return { success: false, message: "강화 처리 중 오류가 발생했습니다." };
   }
 
-  // 7. 강화 로그 기록 (이전 무기 정보)
-  const { data: oldWeaponInfo } = await db
-    .from("weapon_descriptions")
-    .select("name, description")
-    .eq("weapon_type", profile.weapon_type)
-    .eq("concept", profile.weapon_concept)
-    .eq("level", currentLevel)
-    .single();
+  // 7. 강화 로그 기록 + 새 무기 정보 조회를 병렬 처리
+  const weaponName = `${profile.weapon_concept} ${profile.weapon_type}`;
 
-  const { error: logError } = await db.from("upgrade_logs").insert({
-    user_id: user.id,
-    nickname: profile.nickname,
-    action: "UPGRADE",
-    weapon_type: profile.weapon_type,
-    weapon_concept: profile.weapon_concept,
-    weapon_name: oldWeaponInfo?.name ?? `${profile.weapon_concept} ${profile.weapon_type}`,
-    weapon_description: oldWeaponInfo?.description ?? null,
-    from_level: currentLevel,
-    to_level: newLevel,
-    result: result,
-    gold_change: -cost,
-    used_protection: useProtection ? protection : null,
-  });
+  const [, { data: newWeaponInfo }] = await Promise.all([
+    db.from("upgrade_logs").insert({
+      user_id: user.id,
+      nickname: profile.nickname,
+      action: "UPGRADE",
+      weapon_type: profile.weapon_type,
+      weapon_concept: profile.weapon_concept,
+      weapon_name: weaponName,
+      weapon_description: null,
+      from_level: currentLevel,
+      to_level: newLevel,
+      result: result,
+      gold_change: -cost,
+      used_protection: useProtection ? protection : null,
+    }),
+    db
+      .from("weapon_descriptions")
+      .select("name, description")
+      .eq("weapon_type", newWeaponType)
+      .eq("concept", newWeaponConcept)
+      .eq("level", newLevel)
+      .single(),
+  ]);
 
-
-  // 8. 새 무기 정보 조회 (결과에 포함하기 위해)
-  const { data: newWeaponInfo } = await db
-    .from("weapon_descriptions")
-    .select("name, description")
-    .eq("weapon_type", newWeaponType)
-    .eq("concept", newWeaponConcept)
-    .eq("level", newLevel)
-    .single();
-
-  // 9. 페이지 새로고침
+  // 8. 페이지 새로고침
   revalidatePath("/upgrade");
-  revalidatePath("/");
   revalidatePath("/inventory");
 
-  // 10. 결과 반환
+  // 9. 결과 반환
   let maintainMessage = `강화 실패... 단계가 유지되었습니다. (+${currentLevel})`;
   if (useProtection && protection === "high" && newLevel < currentLevel) {
     maintainMessage = `파괴 방지권(상) 발동! 강화단계가 -1되었습니다. (+${newLevel})`;
@@ -441,13 +433,7 @@ export async function sellWeapon(): Promise<{
   }
 
   // 7. 판매 로그 기록
-  const { data: weaponInfo } = await db
-    .from("weapon_descriptions")
-    .select("name, description")
-    .eq("weapon_type", profile.weapon_type)
-    .eq("concept", profile.weapon_concept)
-    .eq("level", currentLevel)
-    .single();
+  const sellWeaponName = `${profile.weapon_concept} ${profile.weapon_type}`;
 
   await db.from("upgrade_logs").insert({
     user_id: user.id,
@@ -455,8 +441,8 @@ export async function sellWeapon(): Promise<{
     action: "SELL",
     weapon_type: profile.weapon_type,
     weapon_concept: profile.weapon_concept,
-    weapon_name: weaponInfo?.name ?? `${profile.weapon_concept} ${profile.weapon_type}`,
-    weapon_description: weaponInfo?.description ?? null,
+    weapon_name: sellWeaponName,
+    weapon_description: null,
     from_level: currentLevel,
     to_level: null,
     result: null,
@@ -465,7 +451,6 @@ export async function sellWeapon(): Promise<{
 
   // 8. 페이지 새로고침
   revalidatePath("/upgrade");
-  revalidatePath("/");
   revalidatePath("/inventory");
 
   return {

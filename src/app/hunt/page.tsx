@@ -15,28 +15,26 @@ export default async function HuntPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // 프로필 정보
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("current_hunting_level, hunting_keys, gold, protection_low, protection_mid, protection_high, is_hunting, hunting_started_at")
-    .eq("id", user?.id ?? "")
-    .single() as { data: (Pick<Profile, "gold" | "protection_low" | "protection_mid" | "protection_high"> & {
-      current_hunting_level: number;
-      hunting_keys: number;
-      is_hunting: boolean;
-      hunting_started_at: string | null;
-    }) | null };
-
-  // 모든 사냥터 정보
-  const { data: huntingGrounds } = await supabase
-    .from("hunting_grounds")
-    .select("*")
-    .order("level", { ascending: true }) as { data: HuntingGround[] | null };
-
-  // 사냥터별 유저 수 조회
-  const { data: userCounts } = await supabase
-    .from("profiles")
-    .select("current_hunting_level");
+  // 프로필, 사냥터 정보, 유저 수를 병렬 조회
+  const [{ data: profile }, { data: huntingGrounds }, { data: userCounts }] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("current_hunting_level, hunting_keys, gold, protection_low, protection_mid, protection_high, is_hunting, hunting_started_at")
+      .eq("id", user?.id ?? "")
+      .single() as Promise<{ data: (Pick<Profile, "gold" | "protection_low" | "protection_mid" | "protection_high"> & {
+        current_hunting_level: number;
+        hunting_keys: number;
+        is_hunting: boolean;
+        hunting_started_at: string | null;
+      }) | null }>,
+    supabase
+      .from("hunting_grounds")
+      .select("*")
+      .order("level", { ascending: true }) as Promise<{ data: HuntingGround[] | null }>,
+    supabase
+      .from("profiles")
+      .select("current_hunting_level") as Promise<{ data: { current_hunting_level: number | null }[] | null }>,
+  ]);
 
   // 레벨별 유저 수 집계
   const userCountByLevel: Record<number, number> = {};

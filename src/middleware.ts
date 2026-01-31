@@ -53,32 +53,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // 로그인 상태일 때 처리
-  if (user) {
-    // profiles가 없으면 생성
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile) {
-      await supabase.from("profiles").insert({
-        id: user.id,
-        weapon_type: "칼",
-        weapon_concept: "그림자",
-        weapon_level: 0,
-        gold: 10000,
-        battle_ticket: 10,
-      });
-    }
-
-    // /login 페이지면 홈으로 리다이렉트
-    if (pathname === "/login") {
-      const url = request.nextUrl.clone();
-      url.pathname = "/";
-      return NextResponse.redirect(url);
-    }
+  // 로그인 상태에서 /login 페이지면 홈으로 리다이렉트
+  if (user && pathname === "/login") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    return NextResponse.redirect(url);
   }
 
   return supabaseResponse;

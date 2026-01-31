@@ -7,18 +7,16 @@ export default async function BattlePage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // 프로필 정보
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("weapon_level, weapon_type")
-    .eq("id", user?.id ?? "")
-    .single() as { data: Pick<Profile, "weapon_level" | "weapon_type"> | null };
-
-  // 랭킹 조회
-  const { rankings, myRank } = await getRankings(20);
-
-  // 티켓 정보 조회
-  const ticketInfo = await getTicketInfo();
+  // 프로필, 랭킹, 티켓 정보를 병렬 조회
+  const [{ data: profile }, { rankings, myRank }, ticketInfo] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("weapon_level, weapon_type")
+      .eq("id", user?.id ?? "")
+      .single() as Promise<{ data: Pick<Profile, "weapon_level" | "weapon_type"> | null }>,
+    getRankings(20),
+    getTicketInfo(),
+  ]);
 
   return (
     <div className="space-y-2">

@@ -40,9 +40,14 @@ export default function HuntingClient({
       const startedAt = new Date(huntingStartedAt).getTime();
       const elapsed = Date.now() - startedAt;
       const remaining = Math.max(0, 5000 - elapsed);
-      setCountdown(Math.ceil(remaining / 1000));
+      if (remaining <= 0) {
+        // 이미 시간이 지난 경우 즉시 완료 처리
+        completeHunt();
+      } else {
+        setCountdown(Math.ceil(remaining / 1000));
+      }
     }
-  }, [isHunting, huntingStartedAt]);
+  }, [isHunting, huntingStartedAt, completeHunt]);
 
   // 카운트다운 타이머
   useEffect(() => {

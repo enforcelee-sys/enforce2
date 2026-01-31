@@ -58,6 +58,30 @@ const DESTROY_MESSAGES = [
   "무기: '안녕히 계세요...'",
 ];
 
+// 대장장이 강화 중 메시지 (20개)
+const BLACKSMITH_MESSAGES = [
+  "대장장이가 모루 위에 무기를 올려놓았다.",
+  "용광로의 불길이 활활 타오른다.",
+  "대장장이가 이마의 땀을 닦는다.",
+  "망치 소리가 대장간에 울려 퍼진다.",
+  "무기에 강화석 가루를 뿌리는 중이다.",
+  "대장장이가 칼날의 상태를 점검한다.",
+  "강화의 기운이 무기에 스며들고 있다.",
+  "대장장이가 집중하며 숨을 고른다.",
+  "불꽃이 튀며 무기가 붉게 달아오른다.",
+  "대장장이가 주문을 읊조린다.",
+  "무기에서 묘한 진동이 느껴진다.",
+  "강화석이 무기와 하나가 되어간다.",
+  "대장장이의 눈빛이 날카로워진다.",
+  "무기가 서서히 빛을 내기 시작한다.",
+  "대장장이가 마지막 담금질을 준비한다.",
+  "용광로의 온도를 미세하게 조절하고 있다.",
+  "대장장이가 무기의 균형을 잡고 있다.",
+  "강화의 기운이 임계점에 다가간다.",
+  "대장장이가 망치를 힘껏 내려친다!",
+  "결과가 곧 나온다... 두근두근.",
+];
+
 // 랜덤 메시지 선택
 const getRandomMessage = (messages: string[]) => {
   return messages[Math.floor(Math.random() * messages.length)];
@@ -144,6 +168,19 @@ export default function UpgradeButtons({
   const [isSelling, setIsSelling] = useState(false);
   const [lastResult, setLastResult] = useState<LastResultData | null>(null);
   const [selectedProtection, setSelectedProtection] = useState<"low" | "mid" | "high" | null>(null);
+  const [smithMessage, setSmithMessage] = useState(BLACKSMITH_MESSAGES[0]);
+
+  // 강화 중일 때 대장장이 메시지 순환
+  useEffect(() => {
+    if (!isUpgrading) return;
+    setSmithMessage(BLACKSMITH_MESSAGES[0]);
+    let idx = 0;
+    const timer = setInterval(() => {
+      idx = (idx + 1) % BLACKSMITH_MESSAGES.length;
+      setSmithMessage(BLACKSMITH_MESSAGES[idx]);
+    }, 1200);
+    return () => clearInterval(timer);
+  }, [isUpgrading]);
 
   // 사용 가능한 파괴 방지권 확인
   const canUseLow = protectionLow > 0 && currentLevel <= 10;
@@ -522,40 +559,55 @@ export default function UpgradeButtons({
           </div>
         )}
 
-        {/* 강화 버튼 */}
-        <Button
-          className="w-full"
-          size="lg"
-          onClick={handleUpgrade}
-          disabled={!canUpgrade || isUpgrading || currentLevel >= 20}
-        >
-          {isUpgrading ? (
-            "강화 중..."
-          ) : currentLevel >= 20 ? (
-            "최고 단계 달성!"
-          ) : gold < upgradeCost ? (
-            `골드 부족 (${upgradeCost.toLocaleString()}G 필요)`
-          ) : (
-            `강화하기 (-${upgradeCost.toLocaleString()}G)`
-          )}
-        </Button>
+        {/* 강화 중 로딩 UI */}
+        {isUpgrading ? (
+          <div className="rounded-xl bg-gray-800 border border-gray-700 p-5 space-y-3">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl animate-bounce-slow">🔨</span>
+              <p className="text-white font-medium text-sm transition-opacity duration-300">
+                {smithMessage}
+              </p>
+            </div>
+            <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-orange-500 via-yellow-400 to-orange-500 rounded-full animate-smith-bar" />
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* 강화 버튼 */}
+            <Button
+              className="w-full"
+              size="lg"
+              onClick={handleUpgrade}
+              disabled={!canUpgrade || currentLevel >= 20}
+            >
+              {currentLevel >= 20 ? (
+                "최고 단계 달성!"
+              ) : gold < upgradeCost ? (
+                `골드 부족 (${upgradeCost.toLocaleString()}G 필요)`
+              ) : (
+                `강화하기 (-${upgradeCost.toLocaleString()}G)`
+              )}
+            </Button>
 
-        {/* 판매 버튼 */}
-        <Button
-          className="w-full"
-          size="lg"
-          variant="secondary"
-          onClick={handleSell}
-          disabled={!canSell || isSelling}
-        >
-          {isSelling ? (
-            "판매 중..."
-          ) : !canSell ? (
-            "0강은 판매 불가"
-          ) : (
-            "무기 판매"
-          )}
-        </Button>
+            {/* 판매 버튼 */}
+            <Button
+              className="w-full"
+              size="lg"
+              variant="secondary"
+              onClick={handleSell}
+              disabled={!canSell || isSelling}
+            >
+              {isSelling ? (
+                "판매 중..."
+              ) : !canSell ? (
+                "0강은 판매 불가"
+              ) : (
+                "무기 판매"
+              )}
+            </Button>
+          </>
+        )}
       </div>
 
       {/* 결과 팝업 - 개선된 디자인 */}
@@ -817,6 +869,20 @@ export default function UpgradeButtons({
         }
         .animate-bounce-slow {
           animation: bounce-slow 2s ease-in-out infinite;
+        }
+        @keyframes smith-bar {
+          0% {
+            width: 0%;
+          }
+          50% {
+            width: 80%;
+          }
+          100% {
+            width: 100%;
+          }
+        }
+        .animate-smith-bar {
+          animation: smith-bar 2s ease-in-out infinite;
         }
       `}</style>
     </>

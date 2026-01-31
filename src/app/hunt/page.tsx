@@ -43,6 +43,21 @@ export default async function HuntPage() {
     userCountByLevel[level] = (userCountByLevel[level] ?? 0) + 1;
   });
 
+  // 5초 지난 사냥 상태는 서버에서 자동 리셋
+  const isStuck = profile?.is_hunting && profile?.hunting_started_at &&
+    (Date.now() - new Date(profile.hunting_started_at).getTime() > 10000);
+  if (isStuck) {
+    // @ts-expect-error - Supabase types not generated
+    await supabase
+      .from("profiles")
+      .update({ is_hunting: false, hunting_started_at: null })
+      .eq("id", user?.id ?? "");
+    if (profile) {
+      profile.is_hunting = false;
+      profile.hunting_started_at = null;
+    }
+  }
+
   const currentLevel = profile?.current_hunting_level ?? 1;
   const currentGround = huntingGrounds?.find(g => g.level === currentLevel);
   const keys = profile?.hunting_keys ?? 0;

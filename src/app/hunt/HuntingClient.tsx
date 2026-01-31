@@ -44,10 +44,13 @@ export default function HuntingClient({
         setResult(data);
         setShowResult(true);
       } else {
-        console.error("Hunt failed:", data.error);
+        // API 실패해도 강제 리셋 시도
+        await fetch("/api/hunt/reset", { method: "POST" }).catch(() => {});
       }
     } catch (error) {
       console.error("Hunt error:", error);
+      // 네트워크 에러 시에도 강제 리셋
+      await fetch("/api/hunt/reset", { method: "POST" }).catch(() => {});
     } finally {
       setIsHunting(false);
       setCountdown(0);

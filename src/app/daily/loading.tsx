@@ -1,9 +1,30 @@
+function S({ className = "" }: { className?: string }) {
+  return <div className={`bg-gray-800 rounded-lg animate-pulse ${className}`} />;
+}
+
 export default function Loading() {
   return (
-    <div className="flex items-center justify-center h-[60vh]">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
-        <p className="text-gray-500 text-sm">로딩 중...</p>
+    <div className="space-y-6">
+      <S className="w-20 h-7" />
+
+      {/* 출석 상태 */}
+      <div className="bg-gray-900 rounded-2xl p-5 space-y-4">
+        <div className="text-center space-y-3">
+          <S className="w-16 h-16 rounded-full mx-auto" />
+          <S className="w-40 h-6 mx-auto" />
+          <S className="w-56 h-4 mx-auto" />
+        </div>
+        <S className="w-full h-12 rounded-xl" />
+      </div>
+
+      {/* 보상 목록 */}
+      <div className="bg-gray-900 rounded-2xl p-4 space-y-3">
+        <S className="w-24 h-5" />
+        <div className="grid grid-cols-7 gap-2">
+          {[...Array(7)].map((_, i) => (
+            <S key={i} className="aspect-square rounded-lg" />
+          ))}
+        </div>
       </div>
     </div>
   );
